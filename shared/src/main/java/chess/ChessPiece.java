@@ -3,6 +3,7 @@ package chess;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+//PASSED ALL TESTS
 
 /**
  * Represents a single chess piece
@@ -15,7 +16,7 @@ public class ChessPiece {
     private PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.color = color;
+        this.color = pieceColor;
         this.type = type;
     }
 
@@ -118,9 +119,12 @@ public class ChessPiece {
                 }
                 if(start.getRow() == 2) {//double jump
                     ChessPosition doubleJump = new ChessPosition(4, start.getColumn());
-                    if(board.getPiece(doubleJump) == null) {
-                        ChessMove possibleMove = new ChessMove(start, doubleJump);
-                        moves.add(possibleMove);
+                    ChessPosition hurdle = new ChessPosition(3, start.getColumn());
+                    if(board.getPiece(hurdle) == null) {
+                        if (board.getPiece(doubleJump) == null) {
+                            ChessMove possibleMove = new ChessMove(start, doubleJump);
+                            moves.add(possibleMove);
+                        }
                     }
                 }
             }
@@ -168,9 +172,12 @@ public class ChessPiece {
                 }
                 if(start.getRow() == 7) {//double jump
                     ChessPosition doubleJump = new ChessPosition(5, start.getColumn());
-                    if(board.getPiece(doubleJump) == null) {
-                        ChessMove possibleMove = new ChessMove(start, doubleJump);
-                        moves.add(possibleMove);
+                    ChessPosition hurdle = new ChessPosition(6, start.getColumn());
+                    if(board.getPiece(hurdle) == null) {
+                        if (board.getPiece(doubleJump) == null) {
+                            ChessMove possibleMove = new ChessMove(start, doubleJump);
+                            moves.add(possibleMove);
+                        }
                     }
                 }
             }

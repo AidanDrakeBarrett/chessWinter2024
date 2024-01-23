@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Objects;
+//ALL TESTS PASSED
 
 /**
  * Represents a single square position on a chess board
