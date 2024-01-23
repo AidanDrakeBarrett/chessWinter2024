@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Arrays;
+//THIS FILE IS COMPLETE AND PASSES ALL TESTS
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -78,7 +79,7 @@ public class ChessBoard {
         ChessPiece whiteBishop2 = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
         board[7][2] = blackBishop1;
         board[7][5] = blackBishop2;
-        board[0][2] = whiteKnight1;
+        board[0][2] = whiteBishop1;
         board[0][5] = whiteBishop2;
 
         ChessPiece blackQueen = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
