@@ -58,9 +58,19 @@ public class ChessGame {
         HashSet<ChessMove> possibleMoves
                 = (HashSet<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
         HashSet<ChessMove> returnableMoves = new HashSet<>();
-        for(ChessMove moves:possibleMoves) {
+        for(ChessMove move:possibleMoves) {
             ChessBoard boardCopy = boardCloner();
+            ChessPosition possibleEnd = move.getEndPosition();
+            ChessPiece movingPiece = boardCopy.getPiece(startPosition);
+            board.addPiece(possibleEnd, movingPiece);
+            board.addPiece(startPosition, null);
+            TeamColor checkingColor = board.getPiece(possibleEnd).getTeamColor();
+            if(!isInCheck(checkingColor)) {
+                returnableMoves.add(move);
+            }
+            board = boardCopy;
         }
+        return returnableMoves;
     }
     private ChessBoard boardCloner() {
         ChessBoard copyBoard = new ChessBoard();
@@ -83,7 +93,23 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition start = move.getStartPosition();
+        HashSet<ChessMove> validMoves = (HashSet<ChessMove>) validMoves(start);
+        if(validMoves.contains(move)) {
+            ChessPiece movePiece = board.getPiece(start);
+            ChessPosition end = move.getEndPosition();
+            board.addPiece(end, movePiece);
+            board.addPiece(start, null);
+            if(teamTurn == TeamColor.WHITE) {
+                setTeamTurn(TeamColor.BLACK);
+            }
+            if(teamTurn == TeamColor.BLACK) {
+                setTeamTurn(TeamColor.WHITE);
+            }
+        }
+        if(!validMoves.contains(move)) {
+            throw new InvalidMoveException("invalid move");
+        }
     }
 
     /**
