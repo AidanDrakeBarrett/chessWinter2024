@@ -1,4 +1,4 @@
-package server;
+package dataAccess;
 
 public interface AuthDAO {
     public void clearData();
