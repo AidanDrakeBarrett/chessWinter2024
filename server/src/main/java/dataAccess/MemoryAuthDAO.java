@@ -1,11 +1,8 @@
 package dataAccess;
 
-import dataAccess.AuthDAO;
-import dataAccess.AuthData;
-
 import java.util.HashSet;
 
-public class MemoryAuthDao implements AuthDAO {
+public class MemoryAuthDAO implements AuthDAO {
     private static HashSet<AuthData> authDataHashSet;
     @Override
     public void clearData() {
