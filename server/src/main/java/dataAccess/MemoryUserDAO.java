@@ -1,6 +1,9 @@
 package dataAccess;
 
+import org.eclipse.jetty.server.Authentication;
+
 import java.util.HashSet;
+import java.util.UUID;
 
 public class MemoryUserDAO implements UserDAO {
     private static HashSet<UserData> userDataHashSet;
@@ -20,8 +23,21 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void createUser(String username, String password, String email) {
-        UserData newUser = new UserData(username, password, email);
+    public boolean getLogin(UserData login) {
+        String username = login.username();
+        for(UserData user: userDataHashSet) {
+            if(user.username() == username) {
+                if(user.password().equals(login.password())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void createUser(UserData newUser) {
         userDataHashSet.add(newUser);
+        String authToken = UUID.randomUUID().toString();
     }
 }
