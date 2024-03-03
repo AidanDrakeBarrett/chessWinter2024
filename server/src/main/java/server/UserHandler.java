@@ -22,6 +22,8 @@ public class UserHandler {
     }
     public static Object logout(Request req, Response res) {
         var userLogout = new Gson().fromJson(req.body(), AuthData.class);
-
+        service.logout(userLogout);
+        res.status(200);
+        return "";
     }
 }

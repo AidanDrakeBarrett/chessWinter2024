@@ -2,6 +2,7 @@ package dataAccess;
 
 import chess.ChessGame;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -33,12 +34,16 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void createGameID(String gameName) {
-
+    public int createGame(String gameName) {
+        int gameID = gameDataHashSet.size() + 1;
+        ChessGame newGame = new ChessGame();
+        GameData newGameData = new GameData(gameID, "", "", gameName, newGame);
+        return gameID;
     }
 
     @Override
-    public Collection<GameData> getGames() {
-        return null;
+    public Collection<GameData> listGames() {
+        HashSet<GameData> games = (HashSet<GameData>) gameDataHashSet.clone();
+        return games;
     }
 }

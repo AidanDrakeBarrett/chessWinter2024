@@ -23,8 +23,9 @@ public class UserService {
         }
         return null;
     }
-    public void logout(AuthData userLogout) {//FIXME: GETAUTH SHOULD BE FED A WHOLE AUTHDATA OBJECT, AND THEN THE AUTHDATA EQUALS METHOD WILL BE USED TO SEE IF IT SHOULD RETURN THE TOKEN. THEN CHECK IN HERE IF THE METHOD RETURNED A NOT NULL AND THEN DELETE THE AUTHDATA.
-        AuthData compareAuth = authDAO.getAuth(userLogout.username());
-
+    public void logout(AuthData userLogout) {//FIXME: Y'ALREADY KNOW WHAT IT IS! NOW WATCH ME HANDLE; ALL MY EXCEPTIONS!
+        if(authDAO.containsAuth(userLogout) != null) {
+            authDAO.deleteAuth(userLogout.username());
+        }
     }
 }

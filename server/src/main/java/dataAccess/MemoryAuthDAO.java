@@ -11,9 +11,9 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuth(String username) {
+    public AuthData containsAuth(AuthData userAuth) {
         for(AuthData auth: authDataHashSet) {
-            if(auth.username() == username) {
+            if(auth.equals(userAuth)) {
                 return auth;
             }
         }
@@ -21,8 +21,12 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(String authToken) {
-
+    public void deleteAuth(String username) {
+        for(AuthData auth: authDataHashSet) {
+            if(auth.username() == username) {
+                authDataHashSet.remove(auth);
+            }
+        }
     }
 
     @Override
