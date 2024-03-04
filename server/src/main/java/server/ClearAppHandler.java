@@ -7,7 +7,7 @@ import spark.Response;
 
 
 public class ClearAppHandler {
-    private static ClearAppService service;
+    private static ClearAppService service = new ClearAppService();
     public ClearAppHandler() {}
 
     public static Object clearApplication(Request req, Response res) {

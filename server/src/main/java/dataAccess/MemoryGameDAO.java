@@ -24,13 +24,31 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void addToGame(String username, ChessGame.TeamColor clientColor, int gameID) {//FIXME: not done
-
-        /*for(GameData game:gameDataHashSet) {
+    public void joinGame(String username, ChessGame.TeamColor clientColor, int gameID) {//FIXME: not done
+        for(GameData game: gameDataHashSet) {
             if(game.gameID() == gameID) {
-
+                String whiteUsername = null;
+                String blackUsername = null;
+                if(clientColor == ChessGame.TeamColor.WHITE) {
+                    if(game.whiteUsername() == null) {
+                        whiteUsername = username;
+                        blackUsername = game.blackUsername();
+                    }
+                }
+                if(clientColor == ChessGame.TeamColor.BLACK) {
+                    if(game.blackUsername() == null) {
+                        whiteUsername = game.whiteUsername();
+                        blackUsername = username;
+                    }
+                }
+                String gameName = game.gameName();
+                ChessGame chessGame = game.chessGame();
+                GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
+                gameDataHashSet.remove(game);
+                gameDataHashSet.add(updatedGame);
+                break;
             }
-        }*/
+        }
     }
 
     @Override

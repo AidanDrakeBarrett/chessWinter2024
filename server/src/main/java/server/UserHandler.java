@@ -8,7 +8,7 @@ import spark.Request;
 import spark.Response;
 
 public class UserHandler {
-    private static UserService service;
+    private static UserService service = new UserService();
     public UserHandler() {}
     public static Object register(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);

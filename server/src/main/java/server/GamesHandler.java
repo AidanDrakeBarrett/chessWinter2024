@@ -11,7 +11,7 @@ import spark.Response;
 import java.util.HashSet;
 
 public class GamesHandler {
-    private static GamesService service;
+    private static GamesService service = new GamesService();
 
     public GamesHandler() {}
 

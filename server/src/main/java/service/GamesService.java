@@ -9,8 +9,8 @@ import dataAccess.MemoryGameDAO;
 import java.util.Collection;
 
 public class GamesService {
-    private static MemoryAuthDAO authDAO;
-    private static MemoryGameDAO gameDAO;
+    private static MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private static MemoryGameDAO gameDAO = new MemoryGameDAO();
 
     public GamesService() {}
 
