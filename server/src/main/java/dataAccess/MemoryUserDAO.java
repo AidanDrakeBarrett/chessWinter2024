@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class MemoryUserDAO implements UserDAO {
-    private static HashSet<UserData> userDataHashSet;
+    private static HashSet<UserData> userDataHashSet = new HashSet<>();
     @Override
     public void clearData() {
         userDataHashSet.clear();

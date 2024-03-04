@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class MemoryGameDAO implements GameDAO {
-    private static HashSet<GameData> gameDataHashSet;
+    private static HashSet<GameData> gameDataHashSet = new HashSet<>();
     @Override
     public void clearData() {
         gameDataHashSet.clear();
