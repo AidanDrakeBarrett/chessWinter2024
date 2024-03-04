@@ -3,6 +3,7 @@ package dataAccess;
 import org.eclipse.jetty.server.Authentication;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MemoryUserDAO implements UserDAO {
@@ -25,11 +26,13 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public boolean getLogin(UserData login) {
         String username = login.username();
+        String password = login.password();
         for(UserData user: userDataHashSet) {
-            if(user.username() == username) {
-                if(user.password().equals(login.password())) {
+            if(Objects.equals(user.username(), username)) {
+                if(Objects.equals(user.password(), password)) {
                     return true;
                 }
+                return false;
             }
         }
         return false;

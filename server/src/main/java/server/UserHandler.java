@@ -18,6 +18,7 @@ public class UserHandler {
     public static Object login(Request req, Response res) {
         var userLogin = new Gson().fromJson(req.body(), UserData.class);
         AuthData newAuth = service.login(userLogin);
+        res.status(200);
         return new Gson().toJson(newAuth);
     }
     public static Object logout(Request req, Response res) {
