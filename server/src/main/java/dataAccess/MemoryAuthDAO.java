@@ -11,9 +11,9 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData containsAuth(AuthData userAuth) {
-        for(AuthData auth: authDataHashSet) {
-            if(auth.equals(userAuth)) {
+    public AuthData containsAuth(String userAuth) {//no need to deserialize for string authtokens
+        for(AuthData auth: authDataHashSet) {//edit for it to work with Strings
+            if(auth.authToken().equals(userAuth)) {
                 return auth;
             }
         }

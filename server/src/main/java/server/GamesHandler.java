@@ -19,10 +19,11 @@ public class GamesHandler {
         var userAuth = new Gson().fromJson(req.body(), AuthData.class);
         HashSet<GameData> games = (HashSet<GameData>) service.listGames(userAuth);
         res.status(200);
-        return new Gson().toJson(games);
+        return new Gson().toJson(games);//do the mapof thing
     }
     public static Object createGame(Request req, Response res) {
-        var userAuth = new Gson().fromJson(req.body(), AuthData.class);
+        String authToken = req.headers("Authorization");
+        var userAuth = new Gson().fromJson(req.body(), AuthData.class);//this will need some editing, too. Embrace the mess.
         var gameName = new Gson().fromJson(req.body(), String.class);
         int gameID = (int) service.createGame(userAuth, gameName);
         res.status(200);

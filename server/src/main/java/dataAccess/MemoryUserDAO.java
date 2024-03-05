@@ -24,7 +24,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public boolean getLogin(UserData login) {
+    public boolean getLogin(UserData login) throws DataAccessException {
         String username = login.username();
         String password = login.password();
         for(UserData user: userDataHashSet) {
@@ -32,10 +32,10 @@ public class MemoryUserDAO implements UserDAO {
                 if(Objects.equals(user.password(), password)) {
                     return true;
                 }
-                return false;
+                throw new DataAccessException("unauthorized");
             }
         }
-        return false;
+        throw new DataAccessException("unauthorized");
     }
 
     @Override

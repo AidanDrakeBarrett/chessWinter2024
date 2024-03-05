@@ -1,9 +1,8 @@
 package service;
 
-import dataAccess.AuthData;
-import dataAccess.MemoryUserDAO;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.UserData;
+import dataAccess.*;
+import server.ResponseException;
+
 
 public class UserService {
     private static MemoryUserDAO userDAO = new MemoryUserDAO();
@@ -17,9 +16,13 @@ public class UserService {
         }
         return null;
     }
-    public AuthData login(UserData userLogin) {//FIXME: EXCEPTION HANDLING, LMAO.
-        if(userDAO.getLogin(userLogin)) {
-            return authDAO.createAuth(userLogin.username());
+    public AuthData login(UserData userLogin) throws ResponseException {//FIXME: EXCEPTION HANDLING, LMAO.
+        try {
+            if(userDAO.getLogin(userLogin)) {
+                return authDAO.createAuth(userLogin.username());
+            }
+        } catch(DataAccessException e) {
+            throw new ResponseException(401, "unauthorized");
         }
         return null;
     }

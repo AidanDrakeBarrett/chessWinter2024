@@ -30,5 +30,5 @@ public class GamesService {
         if(authDAO.containsAuth(userAuth) == userAuth) {
             gameDAO.joinGame(userAuth.username(), playerColor, gameID);
         }
-    }
+    }/*unique request class for the specific function. There's not a specific object to parse for this*/
 }
