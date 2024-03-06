@@ -1,10 +1,8 @@
 package service;
 
 import chess.ChessGame;
-import dataAccess.AuthData;
-import dataAccess.GameData;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryGameDAO;
+import dataAccess.*;
+import server.ResponseException;
 
 import java.util.Collection;
 
@@ -14,11 +12,18 @@ public class GamesService {
 
     public GamesService() {}
 
-    public static Collection<GameData> listGames(AuthData userAuth) {//FIXME: EXCEPTIONS
-        if(authDAO.containsAuth(userAuth) == userAuth) {
+    public static Collection<GameData> listGames(String authToken) throws ResponseException {//FIXME: EXCEPTIONS
+        try {
+            if(authDAO.containsAuth(authToken)) {
+                return gameDAO.listGames();
+            }
+        } catch(DataAccessException e) {
+            throw new ResponseException(401, "");
+        }
+        /*if(authDAO.containsAuth(userAuth) == userAuth) {
             return gameDAO.listGames();
         }
-        return null;
+        return null;*/
     }
     public static Object createGame(AuthData userAuth, String gameName) {//FIXME: EXCEPTIONS
         if(authDAO.containsAuth(userAuth) == userAuth) {

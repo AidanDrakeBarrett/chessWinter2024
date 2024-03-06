@@ -9,6 +9,7 @@ import spark.Request;
 import spark.Response;
 
 import java.util.HashSet;
+import java.util.Map;
 
 public class GamesHandler {
     private static GamesService service = new GamesService();
@@ -16,8 +17,15 @@ public class GamesHandler {
     public GamesHandler() {}
 
     public static Object listGames(Request req, Response res) {
-        var userAuth = new Gson().fromJson(req.body(), AuthData.class);
-        HashSet<GameData> games = (HashSet<GameData>) service.listGames(userAuth);
+        var authToken = req.headers("Authorization");
+        HashSet<GameData> games = null;
+        try {
+            games = (HashSet<GameData>) service.listGames(authToken);
+        } catch(ResponseException resEx) {
+            String message = "Error: unauthorized";
+            res.status(401);
+            return new Gson().toJson(Map.of("message", message));
+        }
         res.status(200);
         return new Gson().toJson(games);//do the mapof thing
     }
