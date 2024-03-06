@@ -9,12 +9,14 @@ public class UserService {
     private static MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
     public UserService() {}
-    public AuthData register(UserData newUser) {//FIXME: EXCEPTION HANDLING
-        if(userDAO.getUser(newUser.username()) == null) {
-            userDAO.createUser(newUser);
-            return authDAO.createAuth(newUser.username());
+    public AuthData register(UserData newUser) throws ResponseException {//FIXME: EXCEPTION HANDLING
+        try {
+            userDAO.containsUsername(newUser.username());
+        } catch(DataAccessException e) {
+            throw new ResponseException(403, "already taken");
         }
-        return null;
+        userDAO.createUser(newUser);
+        return authDAO.createAuth(newUser.username());
     }
     public AuthData login(UserData userLogin) throws ResponseException {//FIXME: EXCEPTION HANDLING, LMAO.
         try {
@@ -26,9 +28,13 @@ public class UserService {
         }
         return null;
     }
-    public void logout(AuthData userLogout) {//FIXME: Y'ALREADY KNOW WHAT IT IS! NOW WATCH ME HANDLE; ALL MY EXCEPTIONS!
-        if(authDAO.containsAuth(userLogout) != null) {
-            authDAO.deleteAuth(userLogout.username());
+    public void logout(String authtoken) throws ResponseException {//FIXME: Y'ALREADY KNOW WHAT IT IS! NOW WATCH ME HANDLE; ALL MY EXCEPTIONS!
+        try {
+            if(authDAO.containsAuth(authtoken)) {
+                authDAO.deleteAuth(authtoken);
+            }
+        } catch(DataAccessException e) {
+            throw new ResponseException(401, "unauthorized");
         }
     }
 }

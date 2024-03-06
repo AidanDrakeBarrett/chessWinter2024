@@ -24,8 +24,8 @@ public class GamesHandler {
     public static Object createGame(Request req, Response res) {
         String authToken = req.headers("Authorization");
         var userAuth = new Gson().fromJson(req.body(), AuthData.class);//this will need some editing, too. Embrace the mess.
-        var gameName = new Gson().fromJson(req.body(), String.class);
-        int gameID = (int) service.createGame(userAuth, gameName);
+        var gameName = new Gson().fromJson(req.body(), GameData.class);
+        int gameID = (int) service.createGame(userAuth, gameName.gameName());
         res.status(200);
         return new Gson().toJson(gameID);
     }

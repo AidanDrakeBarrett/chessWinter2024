@@ -14,13 +14,13 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public UserData getUser(String username) {
+    public boolean containsUsername(String username) throws DataAccessException {
         for(UserData user: userDataHashSet) {
-            if(user.username() == username) {
-                return user;
+            if(Objects.equals(user.username(), username)) {
+                throw new DataAccessException("");
             }
         }
-        return null;
+        return false;
     }
 
     @Override

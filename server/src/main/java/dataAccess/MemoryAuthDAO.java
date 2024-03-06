@@ -1,6 +1,7 @@
 package dataAccess;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
@@ -11,19 +12,19 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData containsAuth(String userAuth) {//no need to deserialize for string authtokens
+    public boolean containsAuth(String userAuth) throws DataAccessException {//no need to deserialize for string authtokens
         for(AuthData auth: authDataHashSet) {//edit for it to work with Strings
             if(auth.authToken().equals(userAuth)) {
-                return auth;
+                return true;
             }
         }
-        return null;
+        throw new DataAccessException("");
     }
 
     @Override
-    public void deleteAuth(String username) {
+    public void deleteAuth(String authToken) {
         for(AuthData auth: authDataHashSet) {
-            if(auth.username() == username) {
+            if(Objects.equals(auth.authToken(), authToken)) {
                 authDataHashSet.remove(auth);
             }
         }

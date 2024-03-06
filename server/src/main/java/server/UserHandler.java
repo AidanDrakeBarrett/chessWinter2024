@@ -14,7 +14,14 @@ public class UserHandler {
     public UserHandler() {}
     public static Object register(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);
-        AuthData newAuth = service.register(newUser);
+        AuthData newAuth = null;
+        try {
+            newAuth = service.register(newUser);
+        } catch(ResponseException resEx) {
+            String message = "Error: already taken";
+            res.status(403);
+            return new Gson().toJson(Map.of("message", message));
+        }
         return new Gson().toJson(newAuth);
     }
     public static Object login(Request req, Response res) {
@@ -22,18 +29,22 @@ public class UserHandler {
         AuthData newAuth = null;
         try {
             newAuth = service.login(userLogin);
-        } catch (ResponseException resEx) {
+        } catch(ResponseException resEx) {
             String message = "Error: unauthorized";
             res.status(401);
-            //res.type("application/json");
             return new Gson().toJson(Map.of("message", message));
         }
         return new Gson().toJson(newAuth);
     }
     public static Object logout(Request req, Response res) {
-        var userLogout = new Gson().fromJson(req.body(), AuthData.class);
-        service.logout(userLogout);
-        res.status(200);
+        var authToken = req.headers("Authorization");
+        try {
+            service.logout(authToken);
+        } catch(ResponseException resEx) {
+            String message = "Error: unauthorized";
+            res.status(401);
+            return new Gson().toJson(Map.of("message", message));
+        }
         return "";
     }
 }
