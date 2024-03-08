@@ -31,7 +31,7 @@ public class MemoryGameDAO implements GameDAO {
                     if(game.whiteUsername() != null) {
                         throw new DataAccessException("Error: already taken");
                     }
-                    GameData newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.chessGame());
+                    GameData newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.chessGame(), game.spectators());
                     gameDataHashSet.remove(game);
                     gameDataHashSet.add(newGame);
                     return;
@@ -40,7 +40,15 @@ public class MemoryGameDAO implements GameDAO {
                     if(game.blackUsername() != null) {
                         throw new DataAccessException("Error: already taken");
                     }
-                    GameData newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.chessGame());
+                    GameData newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.chessGame(), game.spectators());
+                    gameDataHashSet.remove(game);
+                    gameDataHashSet.add(newGame);
+                    return;
+                }
+                if(clientColor == null) {
+                    HashSet<String> newSpectators = game.spectators();
+                    newSpectators.add(username);
+                    GameData newGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.chessGame(), newSpectators);
                     gameDataHashSet.remove(game);
                     gameDataHashSet.add(newGame);
                     return;
@@ -54,7 +62,7 @@ public class MemoryGameDAO implements GameDAO {
     public int createGame(String gameName) {
         int gameID = gameDataHashSet.size() + 1;
         ChessGame newGame = new ChessGame();
-        GameData newGameData = new GameData(gameID, "", "", gameName, newGame);
+        GameData newGameData = new GameData(gameID, "", "", gameName, newGame, new HashSet<>());
         gameDataHashSet.add(newGameData);
         return gameID;
     }

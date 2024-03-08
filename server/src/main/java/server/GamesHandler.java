@@ -30,7 +30,8 @@ public class GamesHandler {
     }
     public static Object createGame(Request req, Response res) {
         var authToken = req.headers("Authorization");
-        var gameName = new Gson().fromJson(req.body(), String.class);
+        var gameRequest = new Gson().fromJson(req.body(), Map.class);
+        String gameName = (String) gameRequest.get("gameName");
         int gameID;
         try {
             gameID = (int) service.createGame(authToken, gameName);
@@ -39,18 +40,21 @@ public class GamesHandler {
             res.status(401);
             return new Gson().toJson(Map.of("message", message));
         }
-        return new Gson().toJson(gameID);
+        return new Gson().toJson(Map.of("gameID", gameID));
     }
     public static Object joinGame(Request req, Response res) {
         var authToken = req.headers("Authorization");
-        var playerColor = new Gson().fromJson(req.body(), ChessGame.TeamColor.class);
-        var gameID = new Gson().fromJson(req.body(), Integer.class);
+        var reqMap = new Gson().fromJson(req.body(), Map.class);
+        var playerColor = (ChessGame.TeamColor) reqMap.get("playerColor");
+        var doubleGameID = (double) reqMap.get("gameID");
+        var gameID = (int) doubleGameID;
         try {
             service.joinGame(authToken, playerColor, gameID);
         } catch(ResponseException resEx) {
             res.status(resEx.getStatusCode());
             return new Gson().toJson(Map.of("message", resEx.getMessage()));
         }
-        return "";
+        res.status(200);
+        return new Gson().toJson(Map.of(200, ""));
     }
 }

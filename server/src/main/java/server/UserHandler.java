@@ -7,6 +7,7 @@ import service.UserService;
 import spark.Request;
 import spark.Response;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class UserHandler {
@@ -14,6 +15,11 @@ public class UserHandler {
     public UserHandler() {}
     public static Object register(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);
+        if((newUser.username() == null) || (newUser.password() == null) || (newUser.email() == null)) {
+            String message = "Error: bad request";
+            res.status(400);
+            return new Gson().toJson(Map.of("message", message));
+        }
         AuthData newAuth = null;
         try {
             newAuth = service.register(newUser);
@@ -45,6 +51,6 @@ public class UserHandler {
             res.status(401);
             return new Gson().toJson(Map.of("message", message));
         }
-        return "";
+        return new Gson().toJson(Map.of(200, ""));
     }
 }
