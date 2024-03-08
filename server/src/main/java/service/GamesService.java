@@ -5,6 +5,7 @@ import dataAccess.*;
 import server.ResponseException;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class GamesService {
     private static MemoryAuthDAO authDAO = new MemoryAuthDAO();
@@ -24,16 +25,34 @@ public class GamesService {
             return gameDAO.listGames();
         }
         return null;*/
+        return null;
     }
-    public static Object createGame(AuthData userAuth, String gameName) {//FIXME: EXCEPTIONS
-        if(authDAO.containsAuth(userAuth) == userAuth) {
-            return gameDAO.createGame(gameName);
+    public static Object createGame(String authToken, String gameName) throws ResponseException {//FIXME: EXCEPTIONS
+        try {
+            if (authDAO.containsAuth(authToken)) {
+                return gameDAO.createGame(gameName);
+            }
+        } catch(DataAccessException e) {
+            throw new ResponseException(401, "");
         }
         return null;
     }
-    public void joinGame(AuthData userAuth, ChessGame.TeamColor playerColor, int gameID) {//FIXME: EXCEPTIONS i do indeed despise the tediousness and poorly explained dynamics of building a chess server in the specs for this phase, but I must continue.
-        if(authDAO.containsAuth(userAuth) == userAuth) {
-            gameDAO.joinGame(userAuth.username(), playerColor, gameID);
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws ResponseException {
+        try {
+            if (authDAO.containsAuth(authToken)) {
+                String username = authDAO.getUsername(authToken);
+                gameDAO.joinGame(username, playerColor, gameID);
+            }
+        } catch(DataAccessException e) {
+            if(Objects.equals(e.getMessage(), "Error: unauthorized")) {
+                throw new ResponseException(401, "Error: unauthorized");
+            }
+            if(Objects.equals(e.getMessage(), "Error: already taken")) {
+                throw new ResponseException(403, "Error: already taken");
+            }
+            if(Objects.equals(e.getMessage(), "Error: bad request")) {
+                throw new ResponseException(400, "Error: bad request");
+            }
         }
     }/*unique request class for the specific function. There's not a specific object to parse for this*/
 }

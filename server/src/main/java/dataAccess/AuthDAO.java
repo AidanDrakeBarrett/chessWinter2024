@@ -5,4 +5,5 @@ public interface AuthDAO {
     public boolean containsAuth(String userAuth) throws DataAccessException;
     public void deleteAuth(String authToken);
     public AuthData createAuth(String username);
+    public String getUsername(String authToken);
 }
