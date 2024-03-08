@@ -2,14 +2,17 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataAccess.AbbreviatedGameData;
 import dataAccess.AuthData;
 import dataAccess.GameData;
 import service.GamesService;
 import spark.Request;
 import spark.Response;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 
 public class GamesHandler {
     private static GamesService service = new GamesService();
@@ -18,15 +21,15 @@ public class GamesHandler {
 
     public static Object listGames(Request req, Response res) {
         var authToken = req.headers("Authorization");
-        HashSet<GameData> games = null;
+        ArrayList<AbbreviatedGameData> games = null;
         try {
-            games = (HashSet<GameData>) service.listGames(authToken);
+            games = (ArrayList<AbbreviatedGameData>) service.listGames(authToken);
         } catch(ResponseException resEx) {
             String message = "Error: unauthorized";
             res.status(401);
             return new Gson().toJson(Map.of("message", message));
         }
-        return new Gson().toJson(games);//do the mapof thing
+        return new Gson().toJson(Map.of("games", games));//do the mapof thing
     }
     public static Object createGame(Request req, Response res) {
         var authToken = req.headers("Authorization");
@@ -45,7 +48,14 @@ public class GamesHandler {
     public static Object joinGame(Request req, Response res) {
         var authToken = req.headers("Authorization");
         var reqMap = new Gson().fromJson(req.body(), Map.class);
-        var playerColor = (ChessGame.TeamColor) reqMap.get("playerColor");
+        var playerColorString = (String) reqMap.get("playerColor");
+        ChessGame.TeamColor playerColor = null;
+        if(Objects.equals(playerColorString, "WHITE")) {
+            playerColor = ChessGame.TeamColor.WHITE;
+        }
+        if(Objects.equals(playerColorString, "BLACK")) {
+            playerColor = ChessGame.TeamColor.BLACK;
+        }
         var doubleGameID = (double) reqMap.get("gameID");
         var gameID = (int) doubleGameID;
         try {

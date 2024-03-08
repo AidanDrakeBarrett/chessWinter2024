@@ -4,18 +4,19 @@ import chess.ChessGame;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class MemoryGameDAO implements GameDAO {
-    private static HashSet<GameData> gameDataHashSet = new HashSet<>();
+    private static ArrayList<GameData> gameDataArrayList = new ArrayList<>();
     @Override
     public void clearData() {
-        gameDataHashSet.clear();
+        gameDataArrayList.clear();
     }
 
     @Override
     public GameData getGame(int gameID) {
-        for(GameData game:gameDataHashSet) {
+        for(GameData game:gameDataArrayList) {
             if(game.gameID() == gameID) {
                 return game;
             }
@@ -25,15 +26,15 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public void joinGame(String username, ChessGame.TeamColor clientColor, int gameID) throws DataAccessException {
-        for(GameData game: gameDataHashSet) {
+        for(GameData game: gameDataArrayList) {
             if(game.gameID() == gameID) {
                 if(clientColor == ChessGame.TeamColor.WHITE) {
                     if(game.whiteUsername() != null) {
                         throw new DataAccessException("Error: already taken");
                     }
                     GameData newGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.chessGame(), game.spectators());
-                    gameDataHashSet.remove(game);
-                    gameDataHashSet.add(newGame);
+                    gameDataArrayList.remove(game);
+                    gameDataArrayList.add(newGame);
                     return;
                 }
                 if(clientColor == ChessGame.TeamColor.BLACK) {
@@ -41,16 +42,16 @@ public class MemoryGameDAO implements GameDAO {
                         throw new DataAccessException("Error: already taken");
                     }
                     GameData newGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.chessGame(), game.spectators());
-                    gameDataHashSet.remove(game);
-                    gameDataHashSet.add(newGame);
+                    gameDataArrayList.remove(game);
+                    gameDataArrayList.add(newGame);
                     return;
                 }
                 if(clientColor == null) {
                     HashSet<String> newSpectators = game.spectators();
                     newSpectators.add(username);
                     GameData newGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.chessGame(), newSpectators);
-                    gameDataHashSet.remove(game);
-                    gameDataHashSet.add(newGame);
+                    gameDataArrayList.remove(game);
+                    gameDataArrayList.add(newGame);
                     return;
                 }
             }
@@ -60,16 +61,20 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public int createGame(String gameName) {
-        int gameID = gameDataHashSet.size() + 1;
+        int gameID = gameDataArrayList.size() + 1;
         ChessGame newGame = new ChessGame();
         GameData newGameData = new GameData(gameID, "", "", gameName, newGame, new HashSet<>());
-        gameDataHashSet.add(newGameData);
+        gameDataArrayList.add(newGameData);
         return gameID;
     }
 
     @Override
-    public Collection<GameData> listGames() {
-        HashSet<GameData> games = (HashSet<GameData>) gameDataHashSet.clone();
+    public Collection<AbbreviatedGameData> listGames() {
+        ArrayList<AbbreviatedGameData> games = new ArrayList<>();
+        for(GameData game:gameDataArrayList) {
+            AbbreviatedGameData smallGame = new AbbreviatedGameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName());
+            games.add(smallGame);
+        }
         return games;
     }
 }

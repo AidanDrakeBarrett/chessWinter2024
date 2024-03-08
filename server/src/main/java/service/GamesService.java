@@ -13,7 +13,7 @@ public class GamesService {
 
     public GamesService() {}
 
-    public static Collection<GameData> listGames(String authToken) throws ResponseException {//FIXME: EXCEPTIONS
+    public static Collection<AbbreviatedGameData> listGames(String authToken) throws ResponseException {//FIXME: EXCEPTIONS
         try {
             if(authDAO.containsAuth(authToken)) {
                 return gameDAO.listGames();
@@ -21,10 +21,6 @@ public class GamesService {
         } catch(DataAccessException e) {
             throw new ResponseException(401, "");
         }
-        /*if(authDAO.containsAuth(userAuth) == userAuth) {
-            return gameDAO.listGames();
-        }
-        return null;*/
         return null;
     }
     public static Object createGame(String authToken, String gameName) throws ResponseException {//FIXME: EXCEPTIONS
