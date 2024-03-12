@@ -8,7 +8,7 @@ public class MemoryAuthDAO implements AuthDAO {
     private static HashSet<AuthData> authDataHashSet = new HashSet<>();
     @Override
     public void clearData() {
-
+        authDataHashSet.clear();
     }
 
     @Override

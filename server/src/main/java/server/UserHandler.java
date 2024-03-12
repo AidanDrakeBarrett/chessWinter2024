@@ -51,6 +51,7 @@ public class UserHandler {
             res.status(401);
             return new Gson().toJson(Map.of("message", message));
         }
-        return new Gson().toJson(Map.of(200, ""));
+        return "{}";
+        //return new Gson().toJson(Map.of(200, ""));
     }
 }
