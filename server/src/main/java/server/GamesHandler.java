@@ -65,6 +65,6 @@ public class GamesHandler {
             return new Gson().toJson(Map.of("message", resEx.getMessage()));
         }
         res.status(200);
-        return new Gson().toJson(Map.of(200, ""));
+        return "{}";
     }
 }

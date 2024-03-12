@@ -2,10 +2,8 @@ package dataAccess;
 
 import chess.ChessGame;
 
+import java.util.*;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public class MemoryGameDAO implements GameDAO {
     private static ArrayList<GameData> gameDataArrayList = new ArrayList<>();
@@ -63,7 +61,7 @@ public class MemoryGameDAO implements GameDAO {
     public int createGame(String gameName) {
         int gameID = gameDataArrayList.size() + 1;
         ChessGame newGame = new ChessGame();
-        GameData newGameData = new GameData(gameID, "", "", gameName, newGame, new HashSet<>());
+        GameData newGameData = new GameData(gameID, null, null, gameName, newGame, new HashSet<>());
         gameDataArrayList.add(newGameData);
         return gameID;
     }
@@ -72,7 +70,15 @@ public class MemoryGameDAO implements GameDAO {
     public Collection<AbbreviatedGameData> listGames() {
         ArrayList<AbbreviatedGameData> games = new ArrayList<>();
         for(GameData game:gameDataArrayList) {
-            AbbreviatedGameData smallGame = new AbbreviatedGameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName());
+            String abbrevBlack = game.blackUsername();
+            String abbrevWhite = game.whiteUsername();
+            if(game.blackUsername() == null) {
+                abbrevBlack = null;
+            }
+            if(game.whiteUsername() == null) {
+                abbrevWhite = null;
+            }
+            AbbreviatedGameData smallGame = new AbbreviatedGameData(game.gameID(), abbrevWhite, abbrevBlack, game.gameName());
             games.add(smallGame);
         }
         return games;
