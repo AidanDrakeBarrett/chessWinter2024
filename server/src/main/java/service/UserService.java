@@ -28,7 +28,7 @@ public class UserService {
         }
         return null;
     }
-    public void logout(String authtoken) throws ResponseException {//FIXME: Y'ALREADY KNOW WHAT IT IS! NOW WATCH ME HANDLE; ALL MY EXCEPTIONS!
+    public void logout(String authtoken) throws ResponseException {
         try {
             if(authDAO.containsAuth(authtoken)) {
                 authDAO.deleteAuth(authtoken);

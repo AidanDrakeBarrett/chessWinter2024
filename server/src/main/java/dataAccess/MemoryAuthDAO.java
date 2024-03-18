@@ -43,4 +43,10 @@ public class MemoryAuthDAO implements AuthDAO {
         }
         return null;
     }
+
+    //FOR TESTING
+
+    public static HashSet<AuthData> getAuthDataHashSet() {
+        return authDataHashSet;
+    }
 }
