@@ -41,7 +41,6 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public void createUser(UserData newUser) {
         userDataHashSet.add(newUser);
-        String authToken = UUID.randomUUID().toString();
     }
     //FOR TESTING ONLY
     public HashSet<UserData> getUserDataHashSet() {

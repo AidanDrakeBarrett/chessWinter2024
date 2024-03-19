@@ -1,5 +1,6 @@
 package serviceTests;
 
+import chess.ChessGame;
 import dataAccess.AbbreviatedGameData;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
@@ -54,6 +55,16 @@ class GamesServiceTest {
     }
 
     @Test
-    void joinGame() {
+    void joinGame() throws ResponseException {
+        String user1 = "user1";
+        String user2 = "user2";
+        String gameName = "game";
+        String authToken1 = authDAO.createAuth(user1).authToken();
+        String authToken2 = authDAO.createAuth(user2).authToken();
+        int gameID = gameDAO.createGame(gameName);
+
+        service.joinGame(authToken1, ChessGame.TeamColor.WHITE, gameID);
+        assertEquals(user1, ((ArrayList<AbbreviatedGameData>) gameDAO.listGames()).getFirst().whiteUsername());
+        assertThrows(ResponseException.class, ()->service.joinGame(authToken2, ChessGame.TeamColor.WHITE, gameID));
     }
 }

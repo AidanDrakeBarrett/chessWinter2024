@@ -50,5 +50,5 @@ public class GamesService {
                 throw new ResponseException(400, "Error: bad request");
             }
         }
-    }/*unique request class for the specific function. There's not a specific object to parse for this*/
+    }
 }
