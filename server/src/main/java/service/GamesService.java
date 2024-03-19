@@ -13,7 +13,7 @@ public class GamesService {
 
     public GamesService() {}
 
-    public static Collection<AbbreviatedGameData> listGames(String authToken) throws ResponseException {//FIXME: EXCEPTIONS
+    public static Collection<AbbreviatedGameData> listGames(String authToken) throws ResponseException {
         try {
             if(authDAO.containsAuth(authToken)) {
                 return gameDAO.listGames();
@@ -23,7 +23,7 @@ public class GamesService {
         }
         return null;
     }
-    public static Object createGame(String authToken, String gameName) throws ResponseException {//FIXME: EXCEPTIONS
+    public static Object createGame(String authToken, String gameName) throws ResponseException {
         try {
             if (authDAO.containsAuth(authToken)) {
                 return gameDAO.createGame(gameName);
