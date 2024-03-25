@@ -1,16 +1,9 @@
 package dataAccess;
 
-import com.google.gson.Gson;
 import server.ResponseException;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.sql.*;
 import java.util.Objects;
-
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class SQLUserDAO implements UserDAO{
@@ -20,7 +13,7 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public void clearData() {
         try(var conn = DatabaseManager.getConnection()) {
-            try(var preparedStatement = conn.prepareStatement("DELETE FROM UserData")) {
+            try(var preparedStatement = conn.prepareStatement("TRUNCATE TABLE UserData")) {
                 preparedStatement.executeUpdate();
             } catch(SQLException sqlEx) {}
         } catch(SQLException sqlEx) {}
