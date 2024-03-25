@@ -1,4 +1,4 @@
-package dataAccess;
+/*package dataAccess;
 
 import com.google.gson.Gson;
 import server.ResponseException;
@@ -58,4 +58,4 @@ public class SQLUserDAO implements UserDAO{
             throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
-}
+}*/
