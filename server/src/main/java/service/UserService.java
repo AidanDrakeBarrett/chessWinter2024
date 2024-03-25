@@ -9,7 +9,7 @@ public class UserService {
     private static MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
     public UserService() {}
-    public AuthData register(UserData newUser) throws ResponseException {//FIXME: EXCEPTION HANDLING
+    public AuthData register(UserData newUser) throws ResponseException {
         try {
             userDAO.containsUsername(newUser.username());
         } catch(DataAccessException e) {
@@ -18,7 +18,7 @@ public class UserService {
         userDAO.createUser(newUser);
         return authDAO.createAuth(newUser.username());
     }
-    public AuthData login(UserData userLogin) throws ResponseException {//FIXME: EXCEPTION HANDLING, LMAO.
+    public AuthData login(UserData userLogin) throws ResponseException {
         try {
             if(userDAO.getLogin(userLogin)) {
                 return authDAO.createAuth(userLogin.username());

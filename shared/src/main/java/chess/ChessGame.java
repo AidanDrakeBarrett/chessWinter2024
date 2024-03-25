@@ -217,28 +217,6 @@ public class ChessGame {
         return true;
     }
 
-    /*private Collection<ChessMove> validMovesOutOfTurn(ChessPosition startPosition) {
-        if(board.getPiece(startPosition) == null) {
-            return null;
-        }
-        HashSet<ChessMove> possibleMoves
-                = (HashSet<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
-        HashSet<ChessMove> returnableMoves = new HashSet<>();
-        for(ChessMove move:possibleMoves) {
-            ChessBoard boardCopy = boardCloner();
-            ChessPosition possibleEnd = move.getEndPosition();
-            ChessPiece movingPiece = boardCopy.getPiece(startPosition);
-            board.addPiece(possibleEnd, movingPiece);
-            board.addPiece(startPosition, null);
-            TeamColor checkingColor = board.getPiece(possibleEnd).getTeamColor();
-            if(!isInCheck(checkingColor)) {
-                returnableMoves.add(move);
-            }
-            board = boardCopy;
-        }
-        return returnableMoves;
-    }*/
-
     /**
      * Sets this game's chessboard with a given board
      *

@@ -1,4 +1,4 @@
-/*package dataAccess;
+package dataAccess;
 
 import chess.ChessGame;
 
@@ -57,4 +57,4 @@ public class SQLGameDAO implements GameDAO{
             throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
-}*/
+}

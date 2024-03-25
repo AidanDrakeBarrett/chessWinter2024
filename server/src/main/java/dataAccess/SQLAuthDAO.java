@@ -1,4 +1,4 @@
-/*package dataAccess;
+package dataAccess;
 
 public class SQLAuthDAO implements AuthDAO{
     @Override
@@ -25,4 +25,4 @@ public class SQLAuthDAO implements AuthDAO{
     public String getUsername(String authToken) {
         return null;
     }
-}*/
+}
