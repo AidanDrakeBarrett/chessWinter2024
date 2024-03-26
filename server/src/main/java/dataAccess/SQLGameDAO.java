@@ -17,7 +17,13 @@ public class SQLGameDAO implements GameDAO{
     }
     @Override
     public void clearData() {
-
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "TRUNCATE TABLE GameData";
+            try(var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            } catch(SQLException sqlEx) {}
+        } catch(SQLException sqlEx) {}
+        catch(DataAccessException) {}
     }
 
     @Override
@@ -41,11 +47,18 @@ public class SQLGameDAO implements GameDAO{
     }
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS game(
-                '
+            CREATE TABLE IF NOT EXISTS GameData(
+                'id' INT NOT NULL AUTO_INCREMENT,
+                'whiteUsername' VARCHAR(256),
+                'blackUsername' VARCHAR(256),
+                'gameName' VARCHAR(256) NOT NULL,
+                'chessGame' VARCHAR(256) NOT NULL,
+                'spectators' VARCHAR(256) NOT NULL,
+                PRIMARY KEY ('id')
+                )
             """
     }
-    private void configureDatabase() throws ResponseException {
+    private void configureDatabase() throws ResponseException, DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
