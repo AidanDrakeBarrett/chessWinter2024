@@ -29,7 +29,7 @@ public class GamesHandler {
             res.status(401);
             return new Gson().toJson(Map.of("message", message));
         }
-        return new Gson().toJson(Map.of("games", games));//do the mapof thing
+        return new Gson().toJson(Map.of("games", games));
     }
     public static Object createGame(Request req, Response res) {
         var authToken = req.headers("Authorization");
