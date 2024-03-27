@@ -2,7 +2,6 @@ package serviceTests;
 
 import dataAccess.*;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.ResponseException;
 import service.UserService;
@@ -10,10 +9,15 @@ import service.UserService;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-    private UserService service = new UserService();
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
-
+    private final UserService service = new UserService();
+    private final MemoryUserDAO userDAO = new MemoryUserDAO();
+    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private final String username1 = "user1";
+    private final String username2 = "user2";
+    private final String password1 = "password1";
+    private final String password2 = "password2";
+    private final String email1 = "email1";
+    private final String email2 = "email2";
     @AfterEach
     void tearDown() {
         userDAO.clearData();
@@ -21,44 +25,44 @@ class UserServiceTest {
     }
 
     @Test
-    void register() throws ResponseException {
-        String username = "user";
-        String email = "email";
-        String password = "password";
-        UserData user = new UserData(username, password, email);
-        service.register(user);
-        assertTrue(userDAO.getUserDataHashSet().contains(user));
-
-        String anotherUsername = "user";
-        String anotherEmail = "Thou swine";
-        String anotherPassword = "another password";
-        UserData anotherUser = new UserData(anotherUsername, anotherPassword, anotherEmail);
-        assertThrows(ResponseException.class, ()->service.register(anotherUser));
+    void registerPositive() throws ResponseException {
+        UserData user1 = new UserData(username1, password1, email1);
+        service.register(user1);
+        assertTrue(userDAO.getUserDataHashSet().contains(user1));
+    }
+    @Test
+    void registerNegative() throws ResponseException {
+        UserData user1 = new UserData(username1, password1, email1);
+        service.register(user1);
+        UserData user2 = new UserData(username1, password2, email2);
+        assertThrows(ResponseException.class, ()->service.register(user2));
     }
 
     @Test
-    void login() throws ResponseException, DataAccessException {
-        String username = "user";
-        String password = "password";
-        String email = "email";
-        UserData user = new UserData(username, password, email);
+    void loginPositive() throws ResponseException, DataAccessException {
+        UserData user1 = new UserData(username1, password1, email1);
 
-        userDAO.createUser(user);
-        String userAuth = service.login(user).authToken();
+        userDAO.createUser(user1);
+        String userAuth = service.login(user1).authToken();
         assertTrue(authDAO.containsAuth(userAuth));
-
-        String badUsername = "bad";
-        UserData badLogin = new UserData(badUsername, password, email);
-        assertThrows(ResponseException.class, ()->service.login(badLogin));
+    }
+    @Test
+    void loginNegative() {
+        UserData user1 = new UserData(username1, password1, email1);
+        userDAO.createUser(user1);
+        UserData user2 = new UserData(username2, password1, email1);
+        assertThrows(ResponseException.class, ()->service.login(user2));
     }
 
     @Test
-    void logout() throws ResponseException, DataAccessException {
-        String username = "user";
-        String authToken = authDAO.createAuth(username).authToken();
+    void logoutPositive() throws ResponseException, DataAccessException {
+        String authToken = authDAO.createAuth(username1).authToken();
         assertTrue(authDAO.containsAuth(authToken));
         service.logout(authToken);
         assertThrows(DataAccessException.class, ()->authDAO.containsAuth(authToken));
-        assertThrows(ResponseException.class, ()->service.logout("fakeToken"));
+    }
+    @Test
+    void logoutNegative() throws ResponseException {
+        assertThrows(ResponseException.class, ()->service.logout("faketoken"));
     }
 }
