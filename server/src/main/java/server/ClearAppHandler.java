@@ -1,6 +1,5 @@
 package server;
 
-import com.google.gson.Gson;
 import service.ClearAppService;
 import spark.Request;
 import spark.Response;

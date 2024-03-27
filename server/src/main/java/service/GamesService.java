@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class GamesService {
-    private static MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private static MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private static SQLAuthDAO authDAO = new SQLAuthDAO();
+    private static SQLGameDAO gameDAO = new SQLGameDAO();
 
     public GamesService() {}
 

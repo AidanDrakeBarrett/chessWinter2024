@@ -7,8 +7,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class SQLAuthDAO implements AuthDAO{
-    public SQLAuthDAO() throws ResponseException, DataAccessException {
-        configureDatabase();
+    public SQLAuthDAO() {
+        try {
+            configureDatabase();
+        } catch(ResponseException resEx) {}
+        catch(DataAccessException e) {}
     }
     @Override
     public void clearData() {

@@ -3,14 +3,11 @@ package server;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.AbbreviatedGameData;
-import dataAccess.AuthData;
-import dataAccess.GameData;
 import service.GamesService;
 import spark.Request;
 import spark.Response;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 

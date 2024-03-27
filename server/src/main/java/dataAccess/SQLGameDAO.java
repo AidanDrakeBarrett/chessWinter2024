@@ -14,8 +14,11 @@ import java.util.Objects;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 public class SQLGameDAO implements GameDAO{
-    public SQLGameDAO() throws ResponseException, DataAccessException {
-        configureDatabase();
+    public SQLGameDAO() {
+        try {
+            configureDatabase();
+        } catch(ResponseException resEx) {}
+        catch(DataAccessException e) {}
     }
     @Override
     public void clearData() {

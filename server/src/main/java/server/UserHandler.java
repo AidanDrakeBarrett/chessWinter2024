@@ -6,8 +6,6 @@ import dataAccess.UserData;
 import service.UserService;
 import spark.Request;
 import spark.Response;
-
-import java.util.ArrayList;
 import java.util.Map;
 
 public class UserHandler {

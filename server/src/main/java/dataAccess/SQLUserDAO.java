@@ -7,8 +7,11 @@ import java.util.Objects;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class SQLUserDAO implements UserDAO{
-    public SQLUserDAO() throws ResponseException, DataAccessException {
-        configureDatabase();
+    public SQLUserDAO() {
+        try {
+            configureDatabase();
+        } catch(ResponseException resEx) {}
+        catch(DataAccessException e) {}
     }
     @Override
     public void clearData() {
