@@ -27,14 +27,16 @@ public class SQLAuthDAO implements AuthDAO{
     public boolean containsAuth(String userAuth) throws DataAccessException {
         try(var conn = DatabaseManager.getConnection()) {
             var statement = """
-                    SELECT FROM AuthData 
+                    SELECT * FROM AuthData 
                     WHERE authToken = ?;
                     """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, userAuth);
                 try(var rs = preparedStatement.executeQuery()) {
-                    if(Objects.equals(rs.getString("authToken"), userAuth)) {
-                        return true;
+                    while(rs.next()) {
+                        if (Objects.equals(rs.getString("authToken"), userAuth)) {
+                            return true;
+                        }
                     }
                 } catch(SQLException sqlEx) {
                     throw new DataAccessException("");
