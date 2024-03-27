@@ -16,7 +16,7 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public void clearData() {
         try(var conn = DatabaseManager.getConnection()) {
-            try(var preparedStatement = conn.prepareStatement("TRUNCATE TABLE AuthData")) {
+            try(var preparedStatement = conn.prepareStatement("TRUNCATE TABLE AuthData;")) {
                 preparedStatement.executeUpdate();
             } catch(SQLException sqlEx) {}
         } catch(SQLException sqlEx) {}
@@ -26,7 +26,10 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public boolean containsAuth(String userAuth) throws DataAccessException {
         try(var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT FROM AuthData WHERE authToken = ?";
+            var statement = """
+                    SELECT FROM AuthData 
+                    WHERE authToken = ?;
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, userAuth);
                 try(var rs = preparedStatement.executeQuery()) {
@@ -48,7 +51,10 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public void deleteAuth(String authToken) {
         try(var conn = DatabaseManager.getConnection()) {
-            var statement = "DELETE FROM AuthData WHERE authToken = ?";
+            var statement = """
+                    DELETE FROM AuthData 
+                    WHERE authToken = ?;
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, authToken);
                 preparedStatement.executeUpdate();
@@ -62,7 +68,10 @@ public class SQLAuthDAO implements AuthDAO{
         String authToken = UUID.randomUUID().toString().replace("-", "");
         AuthData newAuth = new AuthData(username, authToken);
         try(var conn = DatabaseManager.getConnection()) {
-            var statement = "INSERT INTO AuthData (username, authToken) VALUES(?, ?)";
+            var statement = """
+                    INSERT INTO AuthData (username, authToken) 
+                    VALUES(?, ?);
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 preparedStatement.setString(2, authToken);
@@ -76,7 +85,10 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public String getUsername(String authToken) {
         try(var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT FROM AuthData WHERE authToken = ?";
+            var statement = """
+                    SELECT FROM AuthData 
+                    WHERE authToken = ?;
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, authToken);
                 try(var rs = preparedStatement.executeQuery()) {
@@ -90,10 +102,10 @@ public class SQLAuthDAO implements AuthDAO{
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS AuthData (
-                'username' VARCHAR(256) NOT NULL,
-                'authToken' VARCHAR(256) NOT NULL,
-                PRIMARY KEY ('authToken')
-            )
+                username VARCHAR(255) NOT NULL,
+                authToken VARCHAR(255) NOT NULL,
+                PRIMARY KEY (authToken)
+            );
             """
     };
     private void configureDatabase() throws ResponseException, DataAccessException {

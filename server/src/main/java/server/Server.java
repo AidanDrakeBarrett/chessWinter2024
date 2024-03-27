@@ -2,6 +2,10 @@ package server;
 
 import spark.*;
 
+import dataAccess.DatabaseManager;
+
+import java.sql.SQLException;
+
 public class Server {
 
     public int run(int desiredPort) {

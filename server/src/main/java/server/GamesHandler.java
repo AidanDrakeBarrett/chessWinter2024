@@ -44,17 +44,17 @@ public class GamesHandler {
     }
     public static Object joinGame(Request req, Response res) {
         var authToken = req.headers("Authorization");
-        var reqMap = new Gson().fromJson(req.body(), Map.class);
-        var playerColorString = (String) reqMap.get("playerColor");
-        ChessGame.TeamColor playerColor = null;
+        var joinReq = new Gson().fromJson(req.body(), JoinRequests.class);
+        var playerColor = joinReq.playerColor();
+        /*ChessGame.TeamColor playerColor = null;
         if(Objects.equals(playerColorString, "WHITE")) {
             playerColor = ChessGame.TeamColor.WHITE;
         }
         if(Objects.equals(playerColorString, "BLACK")) {
             playerColor = ChessGame.TeamColor.BLACK;
-        }
-        var doubleGameID = (double) reqMap.get("gameID");
-        var gameID = (int) doubleGameID;
+        }*/
+        int gameID = joinReq.gameID();
+        //var gameID = (int) doubleGameID;
         try {
             service.joinGame(authToken, playerColor, gameID);
         } catch(ResponseException resEx) {

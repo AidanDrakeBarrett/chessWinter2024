@@ -23,7 +23,9 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public void clearData() {
         try(var conn = DatabaseManager.getConnection()) {
-            var statement = "TRUNCATE TABLE GameData";
+            var statement = """
+                TRUNCATE TABLE GameData
+                """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             } catch(SQLException sqlEx) {}
@@ -34,7 +36,10 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public GameData getGame(int gameID) {
         try(var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT FROM GameData WHERE id = ?";
+            var statement = """
+                    SELECT * FROM GameData 
+                    WHERE id = ?
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setInt(1, gameID);
                 try(var rs = preparedStatement.executeQuery()) {
@@ -62,15 +67,27 @@ public class SQLGameDAO implements GameDAO{
         try(var conn = DatabaseManager.getConnection()) {
             String colorColumn = null;
             if(clientColor == ChessGame.TeamColor.WHITE) {
-                colorColumn = "whiteUsername";
+                colorColumn = """
+                        whiteUsername
+                        """;
             }
             if(clientColor == ChessGame.TeamColor.BLACK) {
-                colorColumn = "blackUsername";
+                colorColumn = """
+                        blackUsername
+                        """;
             }
             if(clientColor == null) {
-                colorColumn = "spectators";
+                colorColumn = """
+                        spectators
+                        """;
             }
-            var statement = "SELECT " + colorColumn + " FROM GameData WHERE id = ?";
+            var statement = """
+                    SELECT
+                                                """
+                    + colorColumn +
+                    """
+                     FROM GameData WHERE id = ?
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setInt(1, gameID);
                 try(var rs = preparedStatement.executeQuery()) {
@@ -96,7 +113,14 @@ public class SQLGameDAO implements GameDAO{
     }
 
     private void playerInserter(String username, String colorColumn, int gameID, Connection conn) throws SQLException {
-        var statement = "UPDATE GameData SET " + colorColumn + " = ? WHERE id = ?";
+        var statement = """
+                UPDATE GameData SET 
+                """
+                + colorColumn +
+                """
+ 
+                 = ? WHERE id = ?
+                """;
         try(var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.setString(1, username);
             preparedStatement.setInt(2, gameID);
@@ -104,7 +128,10 @@ public class SQLGameDAO implements GameDAO{
         }
     }
     private void spectatorInserter(String username, int gameID, Connection conn) throws SQLException {
-        var statement = "SELECT spectators FROM GameData WHERE id = ?";
+        var statement = """
+                SELECT spectators FROM GameData 
+                WHERE id = ?
+                """;
         try(var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.setInt(1, gameID);
             try(var rs = preparedStatement.executeQuery()) {
@@ -112,7 +139,11 @@ public class SQLGameDAO implements GameDAO{
                 HashSet<String> spectators = new Gson().fromJson(spectatorJson, HashSet.class);
                 spectators.add(username);
                 var updatedSpectatorJson = new Gson().toJson(spectators);
-                var updateStatement = "UPDATE GameData SET spectators WHERE id = ?";
+                var updateStatement = """
+                        UPDATE GameData 
+                        SET spectators 
+                        WHERE id = ?
+                        """;
                 try(var preparedUpdateStatement = conn.prepareStatement(updateStatement)) {
                     preparedUpdateStatement.setInt(1, gameID);
                     preparedUpdateStatement.executeUpdate();
@@ -128,7 +159,11 @@ public class SQLGameDAO implements GameDAO{
             var gameJson = new Gson().toJson(game);
             HashSet<String> spectators = new HashSet<>();
             var spectatorJson = new Gson().toJson(spectators);
-            var statement = "INSERT INTO GameData (gameName, chessGame, spectators) VALUES(?, ?, ?)";
+            var statement = """
+                    INSERT INTO GameData 
+                    (gameName, chessGame, spectators) 
+                    VALUES(?, ?, ?)
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, gameName);
                 preparedStatement.setString(2, gameJson);
@@ -148,7 +183,9 @@ public class SQLGameDAO implements GameDAO{
     public Collection<AbbreviatedGameData> listGames() {
         try(var conn = DatabaseManager.getConnection()) {
             ArrayList<AbbreviatedGameData> games = new ArrayList<>();
-            var statement = "SELECT FROM GameData";
+            var statement = """
+                    SELECT * FROM GameData
+                    """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 try(var rs = preparedStatement.executeQuery()) {
                     while(rs.next()) {
@@ -169,14 +206,14 @@ public class SQLGameDAO implements GameDAO{
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS GameData(
-                'id' INT NOT NULL AUTO_INCREMENT,
-                'whiteUsername' VARCHAR(256),
-                'blackUsername' VARCHAR(256),
-                'gameName' VARCHAR(256) NOT NULL,
-                'chessGame' VARCHAR(256) NOT NULL,
-                'spectators' VARCHAR(256) NOT NULL,
-                PRIMARY KEY ('id')
-                )
+                id INT NOT NULL AUTO_INCREMENT,
+                whiteUsername VARCHAR(255),
+                blackUsername VARCHAR(255),
+                gameName VARCHAR(255) NOT NULL,
+                chessGame VARCHAR(255) NOT NULL,
+                spectators VARCHAR(255) NOT NULL,
+                PRIMARY KEY (id)
+                );
             """
     };
     private void configureDatabase() throws ResponseException, DataAccessException {
