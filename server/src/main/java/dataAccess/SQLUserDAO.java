@@ -55,19 +55,20 @@ public class SQLUserDAO implements UserDAO{
     public boolean getLogin(UserData login) throws DataAccessException {
         String username = login.username();
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(login.password());
         try(var conn = DatabaseManager.getConnection()) {
             var statement = """
-                    SELECT FROM UserData 
+                    SELECT password FROM UserData 
                     WHERE username = ?;
                     """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 try(var rs = preparedStatement.executeQuery()) {
-                    if(Objects.equals(rs.getString("username"), username)) {
-                        if(Objects.equals(rs.getString("password"), hashedPassword)) {
-                            return true;
-                        }
+                    String queriedPassword = null;
+                    while(rs.next()) {
+                        queriedPassword = rs.getString("password");
+                    }
+                    if(encoder.matches(login.password(), queriedPassword)) {
+                        return true;
                     }
                 } catch(SQLException sqlEx) {
                     throw new DataAccessException("");
