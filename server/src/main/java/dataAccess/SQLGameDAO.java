@@ -64,96 +64,60 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void joinGame(String username, ChessGame.TeamColor clientColor, int gameID) throws DataAccessException {
-        if(clientColor == ChessGame.TeamColor.WHITE || clientColor == ChessGame.TeamColor.BLACK) {
-            try(var conn = DatabaseManager.getConnection()) {
+        try(var conn = DatabaseManager.getConnection()) {
+            var idQuery = """
+                        SELECT * FROM GameData
+                        WHERE id = ?;
+                        """;
+            try (var preparedIDQuery = conn.prepareStatement(idQuery)) {
+                boolean validID = false;
+                preparedIDQuery.setInt(1, gameID);
+                var rs = preparedIDQuery.executeQuery();
+                while (rs.next()) {
+                    int checkedID = rs.getInt("gameID");
+                    if (checkedID == gameID) {
+                        validID = true;
+                        break;
+                    }
+                }
+                if (validID == false) {
+                    throw new DataAccessException("Error: bad request");
+                }
+            } catch (SQLException sqlEx) {}
+            if (clientColor == ChessGame.TeamColor.WHITE || clientColor == ChessGame.TeamColor.BLACK) {
                 String statement = null;
                 String columnLabel = null;
-                if(clientColor == ChessGame.TeamColor.WHITE) {
+                if (clientColor == ChessGame.TeamColor.WHITE) {
                     columnLabel = "whiteUsername";
                     statement = """
                             SELECT whiteUsername FROM GameData 
                             WHERE id = ?;
                             """;
                 }
-                if(clientColor == ChessGame.TeamColor.BLACK) {
+                if (clientColor == ChessGame.TeamColor.BLACK) {
                     columnLabel = "blackUsername";
                     statement = """
                             SELECT blackUsername FROM GameData 
                             WHERE id = ?;
                             """;
                 }
-                try(var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.setInt(1, gameID);
                     var rs = preparedStatement.executeQuery();
                     String currentPlayer = null;
-                    while(rs.next()) {
+                    while (rs.next()) {
                         currentPlayer = rs.getString(columnLabel);
                     }
-                    if(Objects.equals(currentPlayer, null)) {
+                    if (Objects.equals(currentPlayer, null)) {
                         playerInserter(username, columnLabel, gameID, conn);
                         return;
                     }
                     throw new DataAccessException("Error: already taken");
-                } catch(SQLException sqlEx) {}
-            } catch(SQLException sqlEx) {}
-            catch(DataAccessException e) {}
-        }
-        try(var conn = DatabaseManager.getConnection()) {
+                } catch (SQLException sqlEx) {}
+            }
             spectatorInserter(username, gameID, conn);
         } catch(SQLException sqlEx) {}
-        catch(DataAccessException e) {}
     }
-    /*public void joinGame(String username, ChessGame.TeamColor clientColor, int gameID) throws DataAccessException {
-        try(var conn = DatabaseManager.getConnection()) {
-            String colorColumn = null;
-            if(clientColor == ChessGame.TeamColor.WHITE) {
-                colorColumn = """
-                        whiteUsername
-                        """;
-            }
-            if(clientColor == ChessGame.TeamColor.BLACK) {
-                colorColumn = """
-                        blackUsername
-                        """;
-            }
-            if(clientColor == null) {
-                colorColumn = """
-                        spectators
-                        """;
-            }
-            var statement = """
-                    SELECT
-                    """
-                    + colorColumn +
-                    """
-                     FROM GameData WHERE id = ?;
-                    """;
-            try(var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setInt(1, gameID);
-                try(var rs = preparedStatement.executeQuery()) {
-                    String whitePlayer = null;
-                    while(rs.next()) {}
-                    if(rs.next()) {
-                        if((clientColor == ChessGame.TeamColor.WHITE) || (clientColor == ChessGame.TeamColor.BLACK)) {
-                            if(!Objects.equals(rs.getString(colorColumn), null)) {
-                                throw new DataAccessException("Error: already taken");
-                            }
-                            playerInserter(username, colorColumn, gameID, conn);
-                            return;
-                        }
-                        if((clientColor == null)) {
-                            spectatorInserter(username, gameID, conn);
-                            return;
-                        }
-                    }
-                } catch(SQLException sqlEx) {
-                    throw new DataAccessException("Error: bad request");
-                }
-            } catch(SQLException sqlEx) {}
-        } catch(SQLException sqlEx) {}
-        catch(DataAccessException e) {}
-    }*/
-
     private void playerInserter(String username, String colorColumn, int gameID, Connection conn) throws SQLException {
         var statement = """
                 UPDATE GameData SET 
