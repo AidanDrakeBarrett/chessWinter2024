@@ -11,8 +11,6 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Objects;
 
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 public class SQLGameDAO implements GameDAO{
     public SQLGameDAO() {
         try {
