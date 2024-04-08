@@ -61,7 +61,11 @@ class SQLAuthDAOTest {
     void deleteAuthPositive() throws DataAccessException {
         authToken1 = authDAO.createAuth(username1).authToken();
         assertTrue(authDAO.containsAuth(authToken1));
+        String username2 = "username2";
+        String authToken2 = authDAO.createAuth(username2).authToken();
+        assertTrue(authDAO.containsAuth(authToken2));
         authDAO.deleteAuth(authToken1);
+        assertTrue(authDAO.containsAuth(authToken2));
         assertThrows(DataAccessException.class, ()->authDAO.containsAuth(authToken1));
     }
     @Test
