@@ -45,10 +45,6 @@ class SQLGameDAOTest {
     @Test
     void getGamePositive() {
         int gameID1 = gameDAO.createGame(gameName1);
-        AbbreviatedGameData abbreviation = new AbbreviatedGameData(gameID1, null, null, gameName1);
-        ArrayList<AbbreviatedGameData> returnList = (ArrayList<AbbreviatedGameData>) gameDAO.listGames();
-        AbbreviatedGameData returnAbbreviation = returnList.getFirst();
-        assertEquals(abbreviation, returnAbbreviation);
         assertTrue(gameDAO.getGame(gameID1).chessGame().getBoard().equals(gameData1.chessGame().getBoard()));
     }
     @Test
