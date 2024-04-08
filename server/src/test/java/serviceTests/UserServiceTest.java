@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
     private final UserService service = new UserService();
-    private final MemoryUserDAO userDAO = new MemoryUserDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private final SQLUserDAO userDAO = new SQLUserDAO();
+    private final SQLAuthDAO authDAO = new SQLAuthDAO();
     private final String username1 = "user1";
     private final String username2 = "user2";
     private final String password1 = "password1";
@@ -25,10 +25,10 @@ class UserServiceTest {
     }
 
     @Test
-    void registerPositive() throws ResponseException {
+    void registerPositive() throws ResponseException, DataAccessException {
         UserData user1 = new UserData(username1, password1, email1);
         service.register(user1);
-        assertTrue(userDAO.getUserDataHashSet().contains(user1));
+        assertTrue(userDAO.getLogin(user1));
     }
     @Test
     void registerNegative() throws ResponseException {

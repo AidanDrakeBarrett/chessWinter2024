@@ -2,8 +2,8 @@ package serviceTests;
 
 import chess.ChessGame;
 import dataAccess.AbbreviatedGameData;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryGameDAO;
+import dataAccess.SQLAuthDAO;
+import dataAccess.SQLGameDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GamesServiceTest {
     private final GamesService service = new GamesService();
-    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private final SQLGameDAO gameDAO = new SQLGameDAO();
+    private final SQLAuthDAO authDAO = new SQLAuthDAO();
     private final String username1 = "user1";
     private final String username2 = "user2";
     private final String gameName1 = "game1";

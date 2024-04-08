@@ -138,7 +138,10 @@ public class SQLGameDAO implements GameDAO{
         try(var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.setInt(1, gameID);
             try(var rs = preparedStatement.executeQuery()) {
-                String spectatorJson = rs.getString("spectators");
+                String spectatorJson = null;
+                while(rs.next()) {
+                    spectatorJson = rs.getString("spectators");
+                }
                 HashSet<String> spectators = new Gson().fromJson(spectatorJson, HashSet.class);
                 spectators.add(username);
                 var updatedSpectatorJson = new Gson().toJson(spectators);
@@ -161,14 +164,17 @@ public class SQLGameDAO implements GameDAO{
         try(var conn = DatabaseManager.getConnection()) {
             ChessGame game = new ChessGame();
             var gameJson = new Gson().toJson(game);
+            HashSet<String> spectators = new HashSet<>();
+            var spectatorJson = new Gson().toJson(spectators);
             var statement = """
                     INSERT INTO GameData 
-                    (gameName, chessGame) 
-                    VALUES(?, ?);
+                    (gameName, chessGame, spectators) 
+                    VALUES(?, ?, ?);
                     """;
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, gameName);
                 preparedStatement.setString(2, gameJson);
+                preparedStatement.setString(3, spectatorJson);
                 preparedStatement.executeUpdate();
                 return newGameIDQuery(gameName, conn);
             } catch(SQLException sqlEx) {}
@@ -209,7 +215,7 @@ public class SQLGameDAO implements GameDAO{
                 blackUsername VARCHAR(255),
                 gameName VARCHAR(255) NOT NULL,
                 chessGame VARCHAR(2047) NOT NULL,
-                spectators VARCHAR(2047),
+                spectators VARCHAR(2047) NOT NULL,
                 PRIMARY KEY (id)
                 );
             """

@@ -10,11 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ClearAppServiceTest {
     private ClearAppService service = new ClearAppService();
-    private MemoryGameDAO gameDAO = new MemoryGameDAO();
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    @BeforeEach
-    void setUp() {
+    private SQLGameDAO gameDAO = new SQLGameDAO();
+    private SQLAuthDAO authDAO = new SQLAuthDAO();
+    private SQLUserDAO userDAO = new SQLUserDAO();
+
+    @Test
+    void clearApplication() {
         String gameName = "game";
         gameDAO.createGame(gameName);
 
@@ -24,14 +25,11 @@ class ClearAppServiceTest {
         UserData newUser = new UserData(username, password, email);
         userDAO.createUser(newUser);
 
-        authDAO.createAuth(username);
-    }
+        String authToken = authDAO.createAuth(username).authToken();
 
-    @Test
-    void clearApplication() {
         service.clearApplication();
         assertTrue(gameDAO.listGames().isEmpty());
-        assertTrue(userDAO.getUserDataHashSet().isEmpty());
-        assertTrue(authDAO.getAuthDataHashSet().isEmpty());
+        assertThrows(DataAccessException.class, ()->userDAO.getLogin(newUser));
+        assertNull(authDAO.getUsername(authToken));
     }
 }
