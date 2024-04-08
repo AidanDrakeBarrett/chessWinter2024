@@ -6,7 +6,6 @@ import dataAccess.DataAccessException;
 import dataAccess.GameData;
 import dataAccess.SQLGameDAO;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
