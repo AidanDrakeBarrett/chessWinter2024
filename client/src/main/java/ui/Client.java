@@ -4,7 +4,6 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import dataAccess.UserData;
 import server.ResponseException;
-import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -14,12 +13,12 @@ public class Client {
     private final ServerFacade server;
     private String serverURL;
     private boolean loggedIn = false;
-    public Client(String url) {
-        server = new ServerFacade(url);
-        serverURL = url;
+    public Client() {
+        server = new ServerFacade();
     }
     public void run() {
         System.out.println("Welcome Aidan's sadly-not-as-cool-as-the-garden-grove-chess-from-System-Shock chess server!\n");
+        System.out.println("\t*Yes, really, and you can fight me about this\n");
         System.out.println("Try typing 'help' for commands\n");
         System.out.print(help());
 
@@ -101,7 +100,8 @@ public class Client {
         if(params.length >= 2) {
             String username = params[0];
             String password = params[1];
-            server.login(username, password);
+            UserData newLogin = new UserData(username, password, null);
+            server.login(newLogin);
             this.username = username;
             this.loggedIn = true;
             return String.format("Logged in as %s.", username);
@@ -122,13 +122,18 @@ public class Client {
     }
     public String join(String... params) throws ResponseException {
         if(params.length >= 1) {
-            int gameID = Integer.parseInt(params[0]);
-            String color = null;
+            String gameID = params[0];
+            ChessGame.TeamColor color = null;
             if(params.length >= 2) {
-                color = params[1];
+                if(params[1] == "WHITE") {
+                    color = ChessGame.TeamColor.WHITE;
+                }
+                if(params[1] == "BLACK") {
+                    color = ChessGame.TeamColor.BLACK;
+                }
             }
             ChessPiece[][] board = server.join(gameID, color);
-            return drawBoard(board);
+            return String.format("joined game as " + color + "\n" + drawBoard(board));
         }
         throw new ResponseException(400, "Error: bad request");
     }
@@ -224,7 +229,7 @@ public class Client {
                 }
             }
         }
-        return String.format(whiteView.toString() + "\u001b[39;49;0m\n" + blackView.toString());
+        return String.format(whiteView + "\u001b[39;49;0m\n" + blackView);
     }
 
 }
