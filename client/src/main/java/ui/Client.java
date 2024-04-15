@@ -2,29 +2,34 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessPiece;
+import dataAccess.AbbreviatedGameData;
 import dataAccess.UserData;
 import server.ResponseException;
 
+import javax.management.Notification;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
+import static java.awt.Color.RED;
+
 public class Client {
-    private String username = null;
-    private final ServerFacade server;
-    private String serverURL;
+    private final ServerFacade serverFacade;
     private boolean loggedIn = false;
-    public Client() {
-        server = new ServerFacade();
+    public Client(String url) {
+        serverFacade = new ServerFacade(url);
     }
     public void run() {
-        System.out.println("Welcome Aidan's sadly-not-as-cool-as-the-garden-grove-chess-from-System-Shock chess server!\n");
-        System.out.println("\t*Yes, really, and you can fight me about this\n");
+        System.out.println("Welcome Aidan's sadly-not-as-cool-as-the-garden-grove-chess-from-System-Shock chess serverFacade!\n");
+        System.out.println("\t*Yes, really, and you can fight me about the name\n");
         System.out.println("Try typing 'help' for commands\n");
         System.out.print(help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
+            printPrompt();
             String line = scanner.nextLine();
             try {
                 result = eval(line);
@@ -35,6 +40,13 @@ public class Client {
         }
         System.out.println();
     }
+    private void printPrompt() {
+        System.out.print("\n\u001b[15;40;0m>>>");
+    }
+    public void notify(Notification notification) {
+        System.out.println(RED + notification.getMessage());
+        printPrompt();
+    }
     public String help() {
         StringBuilder helpCommands = new StringBuilder();
         if(!loggedIn) {
@@ -43,7 +55,7 @@ public class Client {
             helpCommands.append("login <USERNAME> <PASSWORD>\n");
             helpCommands.append("\tlogin to a preexisting account\n");
             helpCommands.append("quit\n");
-            helpCommands.append("\tleave the server\n");
+            helpCommands.append("\tleave the serverFacade\n");
             helpCommands.append("help\n");
             helpCommands.append("\tdisplay possible commands\n");
         }
@@ -91,7 +103,8 @@ public class Client {
             String password = params[1];
             String email = params[2];
             UserData newUser = new UserData(username, password, email);
-            server.register(newUser);
+            serverFacade.register(newUser);
+            loggedIn = true;
             return String.format("Registered and signed in as %s.", username);
         }
         throw new ResponseException(400, "Error: bad request");
@@ -101,9 +114,8 @@ public class Client {
             String username = params[0];
             String password = params[1];
             UserData newLogin = new UserData(username, password, null);
-            server.login(newLogin);
-            this.username = username;
-            this.loggedIn = true;
+            serverFacade.login(newLogin);
+            loggedIn = true;
             return String.format("Logged in as %s.", username);
         }
         throw new ResponseException(400, "Error: bad request");
@@ -111,34 +123,39 @@ public class Client {
     public String create(String... params) throws ResponseException {
         if(params.length >= 1) {
             String gameName = params[0];
-            int gameID = server.create(gameName);
-            return String.format("Created game %s with ID %i.", gameName, gameID);
+            int gameID = serverFacade.create(gameName);
+            return String.format("Created game %s with ID %d.", gameName, gameID);
         }
         throw new ResponseException(400, "Error: bad request");
     }
     public String list() throws ResponseException {
-        String gameList = server.list();
-        return String.format("Current chess games:\n%s", gameList);
+        ArrayList<AbbreviatedGameData> gameList = serverFacade.list();
+        StringBuilder returnList = new StringBuilder("Current chess games:\n");
+        for(AbbreviatedGameData game:gameList) {
+            returnList.append(String.format("gameID: %d, whiteUsername: %s, blackUsername: %s, gameName: %s",
+                    game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+        }
+        return returnList.toString();
     }
     public String join(String... params) throws ResponseException {
         if(params.length >= 1) {
             String gameID = params[0];
             ChessGame.TeamColor color = null;
             if(params.length >= 2) {
-                if(params[1] == "WHITE") {
+                if(Objects.equals(params[1], "WHITE")) {
                     color = ChessGame.TeamColor.WHITE;
                 }
-                if(params[1] == "BLACK") {
+                if(Objects.equals(params[1], "BLACK")) {
                     color = ChessGame.TeamColor.BLACK;
                 }
             }
-            ChessPiece[][] board = server.join(gameID, color);
+            ChessPiece[][] board = serverFacade.join(gameID, color);
             return String.format("joined game as " + color + "\n" + drawBoard(board));
         }
         throw new ResponseException(400, "Error: bad request");
     }
     public String logout() throws ResponseException {
-        server.logout();
+        serverFacade.logout();
         this.loggedIn = false;
         return String.format("logged out");
     }
@@ -151,7 +168,7 @@ public class Client {
                 }
                 if( i > 0) {
                     if(j == 0) {
-                        whiteView.append(String.format("\u001b[30;107;1m %i", j));
+                        whiteView.append(String.format("\u001b[30;107;1m %d", j));
                     }
                     if(j > 0) {
                         String background = null;
@@ -194,7 +211,7 @@ public class Client {
                 }
                 if( i < 8) {
                     if(j == 8) {
-                        blackView.append(String.format("\u001b[30;107;1m %i", j));
+                        blackView.append(String.format("\u001b[30;107;1m %d", j));
                     }
                     if(j < 8) {
                         String background = null;

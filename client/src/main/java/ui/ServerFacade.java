@@ -3,108 +3,104 @@ package ui;
 import chess.ChessGame;
 import chess.ChessPiece;
 import com.google.gson.Gson;
+import dataAccess.AuthData;
 import dataAccess.UserData;
 import server.JoinRequests;
+import server.ResponseException;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ServerFacade {
     private String authToken = null;
-    public enum ResponseType {
-        AUTHORIZATION,
-        EMPTY,
-        GAME_LIST,
-        GAME_ID
-    }
+    private final String serverURL;
 
-    public ServerFacade() {
-        /*URI uri = new URI(url);
-        http = (HttpURLConnection) uri.toURL().openConnection();*/
+    public ServerFacade(String url) {
+        serverURL = url;
     }
-    public void register(UserData newUser) throws Exception {
-        String url = "http://localhost:8080/user";
+    public void register(UserData newUser) throws ResponseException {
+        var path = "/user";
         var body = new Gson().toJson(newUser);
         String method = "POST";
-        HttpURLConnection http = sendRequest(url, method, body, authToken);
-        ResponseType responseType = ResponseType.AUTHORIZATION;
-        receiveResponse(http, responseType);
+        this.authToken = sendRequest(path, method, body, authToken, AuthData.class).authToken();
     }
-    public void login(UserData newLogin) throws Exception {
-        String url = "http://localhost:8080/session";
+    public void login(UserData newLogin) throws ResponseException {
+        var path = "/session";
         var body = new Gson().toJson(newLogin);
         String method = "POST";
-        HttpURLConnection http = sendRequest(url, method, body, authToken);
-        ResponseType responseType = ResponseType.AUTHORIZATION;
-        receiveResponse(http, responseType);
+        this.authToken = sendRequest(path, method, body, authToken, AuthData.class).authToken();
     }
-    public int create(String gameName) throws Exception {
-        String url = "http://localhost:8080/game";
+    public int create(String gameName) throws ResponseException {
+        String path = "/game";
         var body = new Gson().toJson(Map.of("gameName: ", gameName));
         String method = "POST";
-        HttpURLConnection http = sendRequest(url, method, body, authToken);
-        ResponseType responseType = ResponseType.GAME_ID;
-        receiveResponse(http, responseType);
+        return sendRequest(path, method, body, authToken, Integer.class);
     }
-    public String list() throws Exception {
-        //I am an idiot. I can't do anything right. I am retarded.
-        String url = "http://localhost:8080/game";
+    public ArrayList list() throws ResponseException {
+        String path = "/game";
         String body = null;
         String method = "GET";
-        HttpURLConnection http = sendRequest(url, method, body, authToken);
-        ResponseType responseType = ResponseType.GAME_LIST;
-        receiveResponse(http, responseType);
+        return sendRequest(path, method, body, authToken, ArrayList.class);
     }
-    public ChessPiece[][] join(String gameID, ChessGame.TeamColor color) throws Exception {
-        String url = "http://localhost:8080/game";
+    public ChessPiece[][] join(String gameID, ChessGame.TeamColor color) throws ResponseException {
+        String path = "/game";
         var body = new Gson().toJson(new JoinRequests(color, Integer.parseInt(gameID)));
         String method = "PUT";
-        HttpURLConnection http = sendRequest(url, method, body, authToken);
-        ResponseType responseType = ResponseType.EMPTY;
-        receiveResponse(http, responseType);
+        return sendRequest(path, method, body, authToken, ChessPiece[][].class);
     }
-    public void logout() throws Exception {
-        String url = "http://localhost:8080/session";
+    public void logout() throws ResponseException {
+        String path = "/session";
         String body = null;
         String method = "DELETE";
-        HttpURLConnection http = sendRequest(url, method, body, authToken);
-        ResponseType responseType = ResponseType.GAME_LIST;
-        receiveResponse(http, responseType);
+        HttpURLConnection http = sendRequest(path, method, body, authToken, null);
     }
-    private static HttpURLConnection sendRequest(String url, String method, String body, String authToken) throws URISyntaxException, IOException {
-        URI uri = new URI(url);
-        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        if(authToken != null) {
-            http.setRequestProperty("Authorization", authToken);
+    private <T> T sendRequest(String path, String method, String body, String authToken, Class<T> responseClass) throws ResponseException {
+        try {
+            URI uri = new URI(serverURL + path);
+            HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+            if (authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
+            writeRequestBody(body, http);
+            http.connect();
+            throwIfNotSuccessful(http);
+            return readResponseBody(http, responseClass);
+        } catch(Exception e) {
+            throw new ResponseException(500, e.getMessage());
         }
-        http.setRequestMethod(method);
-        writeRequestBody(body, http);
-        http.connect();
-        System.out.printf("= Request =========\n[%s] %s\n\n%s\n\n", method, url, body);
-        return http;
     }
     private static void writeRequestBody(String body, HttpURLConnection http) throws IOException {
-        if (!body.isEmpty()) {
-            http.setDoOutput(true);
-            try (var outputStream = http.getOutputStream()) {
-                outputStream.write(body.getBytes());
+        if(body != null) {
+            http.addRequestProperty("Content-Type", "application/json");
+            try(OutputStream reqBody = http.getOutputStream()) {
+                reqBody.write(body.getBytes());
             }
         }
-    }
-    private static void receiveResponse(HttpURLConnection http, ResponseType responseType) throws IOException {
-        var statusCode = http.getResponseCode();
-        var statusMessage = http.getResponseMessage();
 
-        Object responseBody = readResponseBody(http);
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", statusCode, statusMessage, responseBody);
     }
-    private static Object readResponseBody(HttpURLConnection http, ResponseType responseType) throws IOException {
-        Object responseBody = "";
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = new Gson().fromJson(inputStreamReader, Map.class);
+    private static <T> T readResponseBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
+        T response = null;
+        if(http.getContentLength() < 0) {
+            try(InputStream resBody = http.getInputStream()) {
+                InputStreamReader reader = new InputStreamReader(resBody);
+                if(responseClass != null) {
+                    response = new Gson().fromJson(reader, responseClass);
+                }
+            }
         }
-        return responseBody;
+        return response;
+    }
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
+        var status = http.getResponseCode();
+        if(!successful(status)) {
+            throw new ResponseException(status, "failure: " + status);
+        }
+    }
+    private boolean successful(int status) {
+        return status / 100 == 2;
     }
 }
