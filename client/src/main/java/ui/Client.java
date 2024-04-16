@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import dataAccess.AbbreviatedGameData;
@@ -33,6 +34,7 @@ public class Client {
             String line = scanner.nextLine();
             try {
                 result = eval(line);
+                System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -123,7 +125,7 @@ public class Client {
     public String create(String... params) throws ResponseException {
         if(params.length >= 1) {
             String gameName = params[0];
-            int gameID = serverFacade.create(gameName);
+            int gameID = (int) serverFacade.create(gameName);
             return String.format("Created game %s with ID %d.", gameName, gameID);
         }
         throw new ResponseException(400, "Error: bad request");

@@ -36,7 +36,9 @@ public class ServerFacade {
         String path = "/game";
         var body = new Gson().toJson(Map.of("gameName: ", gameName));
         String method = "POST";
-        return sendRequest(path, method, body, authToken, Integer.class);
+        var newGame = sendRequest(path, method, body, authToken, Map.class);
+        Double gameID = (Double) newGame.get("gameID");
+        return gameID.intValue();
     }
     public ArrayList list() throws ResponseException {
         String path = "/game";
@@ -54,7 +56,7 @@ public class ServerFacade {
         String path = "/session";
         String body = null;
         String method = "DELETE";
-        HttpURLConnection http = sendRequest(path, method, body, authToken, null);
+        sendRequest(path, method, body, authToken, null);
     }
     private <T> T sendRequest(String path, String method, String body, String authToken, Class<T> responseClass) throws ResponseException {
         try {
