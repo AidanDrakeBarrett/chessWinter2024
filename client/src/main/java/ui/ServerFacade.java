@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import chess.ChessPiece;
 import com.google.gson.Gson;
+import dataAccess.AbbreviatedGameData;
 import dataAccess.AuthData;
 import dataAccess.UserData;
 import server.JoinRequests;
@@ -34,7 +35,7 @@ public class ServerFacade {
     }
     public int create(String gameName) throws ResponseException {
         String path = "/game";
-        var body = new Gson().toJson(Map.of("gameName: ", gameName));
+        var body = new Gson().toJson(Map.of("gameName", gameName));
         String method = "POST";
         var newGame = sendRequest(path, method, body, authToken, Map.class);
         Double gameID = (Double) newGame.get("gameID");
@@ -44,7 +45,9 @@ public class ServerFacade {
         String path = "/game";
         String body = null;
         String method = "GET";
-        return sendRequest(path, method, body, authToken, ArrayList.class);
+        var listMap = sendRequest(path, method, body, authToken, Map.class);
+        ArrayList<AbbreviatedGameData> listArray = (ArrayList<AbbreviatedGameData>) listMap.get("games");
+        return listArray;
     }
     public ChessPiece[][] join(String gameID, ChessGame.TeamColor color) throws ResponseException {
         String path = "/game";

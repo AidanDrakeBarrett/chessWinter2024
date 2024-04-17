@@ -125,7 +125,7 @@ public class Client {
     public String create(String... params) throws ResponseException {
         if(params.length >= 1) {
             String gameName = params[0];
-            int gameID = (int) serverFacade.create(gameName);
+            int gameID = serverFacade.create(gameName);
             return String.format("Created game %s with ID %d.", gameName, gameID);
         }
         throw new ResponseException(400, "Error: bad request");
@@ -143,16 +143,21 @@ public class Client {
         if(params.length >= 1) {
             String gameID = params[0];
             ChessGame.TeamColor color = null;
+            String position = "spectator";
             if(params.length >= 2) {
                 if(Objects.equals(params[1], "WHITE")) {
                     color = ChessGame.TeamColor.WHITE;
+                    position = "white";
                 }
                 if(Objects.equals(params[1], "BLACK")) {
                     color = ChessGame.TeamColor.BLACK;
+                    position = "black";
                 }
             }
-            ChessPiece[][] board = serverFacade.join(gameID, color);
-            return String.format("joined game as " + color + "\n" + drawBoard(board));
+            //ChessPiece[][] board = serverFacade.join(gameID, color);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            return String.format("joined game as " + position + "\n" + drawBoard(board.getBoard()));
         }
         throw new ResponseException(400, "Error: bad request");
     }
@@ -166,11 +171,11 @@ public class Client {
         for(int i = 8; i >= 0; --i) {
             for(int j = 0; j < 9; ++j) {
                 if(i == 0 && j == 0) {
-                    whiteView.append("\u001b[30;107;1m abcdefgh\n");
+                    whiteView.append("\u001b[30;107;1m    a  b  c  d  e  f  g  h \u001b[39;49;0m\n");
                 }
                 if( i > 0) {
                     if(j == 0) {
-                        whiteView.append(String.format("\u001b[30;107;1m %d", j));
+                        whiteView.append(String.format("\u001b[30;107;1m %d ", i));
                     }
                     if(j > 0) {
                         String background = null;
@@ -180,26 +185,31 @@ public class Client {
                         if((i % 2) != (j % 2)) {
                             background = "100;1m";
                         }
-                        ChessPiece piece = board[i - 1][j - 1];
-                        String pieceColor = null;
-                        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                            pieceColor = "\u001b[37;";
+                        if(board[i - 1][j - 1] != null) {
+                            ChessPiece piece = board[i - 1][j - 1];
+                            String pieceColor = null;
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                pieceColor = "\u001b[37;";
+                            }
+                            if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                                pieceColor = "\u001b[30;";
+                            }
+                            String pieceType = null;
+                            switch (piece.getPieceType()) {
+                                case PAWN -> pieceType = " P ";
+                                case ROOK -> pieceType = " R ";
+                                case KNIGHT -> pieceType = " N ";
+                                case BISHOP -> pieceType = " B ";
+                                case KING -> pieceType = " K ";
+                                case QUEEN -> pieceType = " Q ";
+                            }
+                            whiteView.append(String.format(pieceColor + background + pieceType));
                         }
-                        if(piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                            pieceColor = "\u001b[30;";
+                        if(board[i - 1][j - 1] == null) {
+                            whiteView.append(String.format("\u001b[" + background + "   "));
                         }
-                        String pieceType = null;
-                        switch(piece.getPieceType()) {
-                            case PAWN -> pieceType = "P";
-                            case ROOK -> pieceType = "R";
-                            case KNIGHT -> pieceType = "N";
-                            case BISHOP -> pieceType = "B";
-                            case KING -> pieceType = "K";
-                            case QUEEN -> pieceType = "Q";
-                        }
-                        whiteView.append(String.format(background + pieceColor + pieceType));
                         if(j == 8) {
-                            whiteView.append("\n");
+                            whiteView.append("\u001b[39;49;0m\n");
                         }
                     }
                 }
@@ -209,11 +219,11 @@ public class Client {
         for(int i = 0; i < 9; ++i) {
             for(int j = 8; j >= 0; --j) {
                 if(i == 8 && j == 8) {
-                    blackView.append("\u001b[30;107;1m hgfedcba\n");
+                    blackView.append("\u001b[30;107;1m    h  g  f  e  d  c  b  a \u001b[39;49;0m\n");
                 }
                 if( i < 8) {
                     if(j == 8) {
-                        blackView.append(String.format("\u001b[30;107;1m %d", j));
+                        blackView.append(String.format("\u001b[30;107;1m %d ", (i + 1)));
                     }
                     if(j < 8) {
                         String background = null;
@@ -223,26 +233,31 @@ public class Client {
                         if((i % 2) != (j % 2)) {
                             background = "100;1m";
                         }
-                        ChessPiece piece = board[i][j];
-                        String pieceColor = null;
-                        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                            pieceColor = "\u001b[37;";
+                        if(board[i][j] != null) {
+                            ChessPiece piece = board[i][j];
+                            String pieceColor = null;
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                                pieceColor = "\u001b[37;";
+                            }
+                            if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                                pieceColor = "\u001b[30;";
+                            }
+                            String pieceType = null;
+                            switch (piece.getPieceType()) {
+                                case PAWN -> pieceType = " P ";
+                                case ROOK -> pieceType = " R ";
+                                case KNIGHT -> pieceType = " N ";
+                                case BISHOP -> pieceType = " B ";
+                                case KING -> pieceType = " K ";
+                                case QUEEN -> pieceType = " Q ";
+                            }
+                            blackView.append(String.format(pieceColor + background + pieceType));
                         }
-                        if(piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                            pieceColor = "\u001b[30;";
+                        if(board[i][j] == null) {
+                            blackView.append(String.format("\u001b[" + background + "   "));
                         }
-                        String pieceType = null;
-                        switch(piece.getPieceType()) {
-                            case PAWN -> pieceType = "P";
-                            case ROOK -> pieceType = "R";
-                            case KNIGHT -> pieceType = "N";
-                            case BISHOP -> pieceType = "B";
-                            case KING -> pieceType = "K";
-                            case QUEEN -> pieceType = "Q";
-                        }
-                        blackView.append(String.format(pieceColor + background + pieceType));
                         if(j == 0) {
-                            blackView.append("\n");
+                            blackView.append("\u001b[39;49;0m\n");
                         }
                     }
                 }
