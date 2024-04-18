@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import chess.ChessPiece;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import dataAccess.AbbreviatedGameData;
 import dataAccess.AuthData;
 import dataAccess.UserData;
@@ -46,20 +47,23 @@ public class ServerFacade {
         String body = null;
         String method = "GET";
         var listMap = sendRequest(path, method, body, authToken, Map.class);
-        ArrayList<AbbreviatedGameData> listArray = (ArrayList<AbbreviatedGameData>) listMap.get("games");
+        Gson gson = new Gson();
+        var arrayJson = gson.toJson(listMap.get("games"));
+        ArrayList<AbbreviatedGameData> listArray = gson.fromJson(arrayJson, new TypeToken<ArrayList<AbbreviatedGameData>>(){}.getType());
         return listArray;
     }
-    public ChessPiece[][] join(String gameID, ChessGame.TeamColor color) throws ResponseException {
+    public void join(String gameID, ChessGame.TeamColor color) throws ResponseException {
         String path = "/game";
         var body = new Gson().toJson(new JoinRequests(color, Integer.parseInt(gameID)));
         String method = "PUT";
-        return sendRequest(path, method, body, authToken, ChessPiece[][].class);
+        sendRequest(path, method, body, authToken, null);
     }
     public void logout() throws ResponseException {
         String path = "/session";
         String body = null;
         String method = "DELETE";
         sendRequest(path, method, body, authToken, null);
+        authToken = null;
     }
     private <T> T sendRequest(String path, String method, String body, String authToken, Class<T> responseClass) throws ResponseException {
         try {
@@ -107,5 +111,8 @@ public class ServerFacade {
     }
     private boolean successful(int status) {
         return status / 100 == 2;
+    }
+    public String getAuth() {
+        return authToken;
     }
 }

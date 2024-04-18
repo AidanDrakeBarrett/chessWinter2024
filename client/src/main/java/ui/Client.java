@@ -145,11 +145,11 @@ public class Client {
             ChessGame.TeamColor color = null;
             String position = "spectator";
             if(params.length >= 2) {
-                if(Objects.equals(params[1], "WHITE")) {
+                if(Objects.equals(params[1], "white")) {
                     color = ChessGame.TeamColor.WHITE;
                     position = "white";
                 }
-                if(Objects.equals(params[1], "BLACK")) {
+                if(Objects.equals(params[1], "black")) {
                     color = ChessGame.TeamColor.BLACK;
                     position = "black";
                 }
